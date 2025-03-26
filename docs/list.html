@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slide Thumbnail List</title>
+    <title>Presentation Slide List</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"
         onError="this.onError=null;this.href='bootstrap.min.css';">
@@ -65,6 +65,10 @@
             <path
                 d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z" />
         </symbol>
+        <symbol fill="currentColor" id="bi-image-fill" viewBox="0 0 16 16">
+            <path
+                d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0" />
+        </symbol>
     </svg>
     <div class="container-fluid">
 
@@ -72,24 +76,32 @@
             <div class="col-12">
                 <div id="controlBar" class="mb-3">
                     <div class="input-group">
-                        <a href="index.html" class="btn btn-outline-secondary" title="Back to Control Panel">
-                            <svg class="bi" width="28" height="28" style="position: relative;">
-                                <use xlink:href="#bi-house" width="26" height="26" />
-                                <use xlink:href="#bi-arrow-left" width="14" height="14" x="6" y="8" />
+                        <a href="index.html" class="btn btn-outline-secondary m-auto" title="Back to Control Panel">
+                            <svg class="bi" width="32" height="32" style="position: relative;">
+                                <use xlink:href="#bi-house" width="28" height="28" />
+                                <use xlink:href="#bi-arrow-left" width="16" height="16" x="6" y="8" />
                             </svg>
                         </a>
-                        <span class="input-group-text">Presentation</span>
-                        <select class="form-select" id="presentationSelect" style="min-width: 250px;">
-                            <option value="active" selected>Active Presentation</option>
-                            <!-- Other presentations will be loaded here -->
-                        </select>
-                        <span class="input-group-text ms-2">Thumbnail Quality</span>
-                        <select class="form-select" id="qualitySelect" style="max-width: 200px;">
-                            <option value="400">Low Quality</option>
-                            <option value="600" selected>Good Quality</option>
-                            <option value="800">Better Quality</option>
-                            <option value="1200">Best Quality</option>
-                        </select>
+                        <div class="form-floating">
+                            <select class="form-select" id="presentationSelect" aria-label="Select Presentation">
+                                <option value="active" selected>Active Presentation</option>
+                                <!-- Other presentations will be loaded here -->
+                            </select>
+                            <label for="presentationSelect">Presentation</label>
+                        </div>
+                        
+                        <button id="menuQualitySelection" class="btn btn-outline-primary dropdown-toggle" type="button"
+                            title="Select image quality" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg class="bi" width="16" height="16">
+                                <use xlink:href="#bi-image-fill" />
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" data-quality="400">Low Quality</a></li>
+                            <li><a class="dropdown-item" href="#" data-quality="600">Good Quality</a></li>
+                            <li><a class="dropdown-item" href="#" data-quality="800">Better Quality</a></li>
+                            <li><a class="dropdown-item" href="#" data-quality="1200">Best Quality</a></li>
+                        </ul>
                         <button id="refreshButton" class="btn btn-outline-primary" title="Refresh thumbnails">
                             <svg class="bi" width="16" height="16">
                                 <use xlink:href="#bi-refresh" />
@@ -110,12 +122,10 @@
         <div class="row bg-light">
             <div class="col-12 border-bottom text-start">
                 <span class="text-muted small">Slide Thumbnails for:</span>
-                <h1 id="presentationTitle" class="text-start display-5">Loading presentation...</h1>
+                <h1 id="presentationTitle" class="text-start display-6">Loading presentation...</h1>
 
             </div>
         </div>
-
-
 
         <div class="row">
             <div class="col-12">
@@ -145,7 +155,8 @@
         let isConnected = false;
         let currentPresentation = null;
         let activeSlideIndex = null;
-        let triggerOnClick = true;
+        let triggerOnClick = false;
+        let selectedQuality = 600;
 
         document.addEventListener('DOMContentLoaded', async function () {
             // Check if we have a connection
@@ -172,17 +183,23 @@
             // Set quality select from localStorage
             const quality = localStorage.getItem('quality');
             if (quality) {
-                document.getElementById('qualitySelect').value = quality;
+                selectedQuality = quality;
+                // make the quality selection in the dropdown text bold for the selected value
+                document.querySelectorAll('.dropdown-menu a').forEach(item => {
+                    if (item.getAttribute('data-quality') === quality) {
+                        item.classList.add('fw-semibold');
+                    }
+                });
             }
 
             // Setup trigger on click toggle
-            const savedTriggerSetting = localStorage.getItem('triggerOnClick');
-            triggerOnClick = savedTriggerSetting !== 'false';
+            //const savedTriggerSetting = localStorage.getItem('triggerOnClick');
+            //triggerOnClick = savedTriggerSetting !== 'false';
             document.getElementById('triggerOnClickToggle').checked = triggerOnClick;
 
             document.getElementById('triggerOnClickToggle').addEventListener('change', function () {
                 triggerOnClick = this.checked;
-                localStorage.setItem('triggerOnClick', triggerOnClick);
+                //localStorage.setItem('triggerOnClick', triggerOnClick);
             });
 
             // Setup refresh button handler
@@ -190,16 +207,29 @@
                 await loadAllSlideThumbnails();
             });
 
-            // Setup quality select handler
-            document.getElementById('qualitySelect').addEventListener('change', function () {
-                const quality = this.value;
-                localStorage.setItem('quality', quality);
-                loadAllSlideThumbnails();
-            });
-
             // Setup presentation select handler
             document.getElementById('presentationSelect').addEventListener('change', function () {
                 loadAllSlideThumbnails();
+            });
+
+            // Setup menu quality selection handler
+            document.querySelectorAll('.dropdown-menu a').forEach(item => {
+
+                item.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const quality = this.getAttribute('data-quality');
+                    this.classList.add('fw-semibold');
+                    selectedQuality = quality;
+                    localStorage.setItem('quality', quality);
+                    loadAllSlideThumbnails();
+
+                    // Remove bold text from other items
+                    document.querySelectorAll('.dropdown-menu a').forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('fw-semibold');
+                        }
+                    });
+                });
             });
         });
 
@@ -213,7 +243,7 @@
 
             try {
                 const baseUrl = localStorage.getItem('baseUrl');
-                const quality = document.getElementById('qualitySelect').value;
+                const quality = selectedQuality;
                 const selectedPresentationId = document.getElementById('presentationSelect').value;
 
                 // Load the selected presentation
@@ -438,6 +468,18 @@
         async function triggerSlide(slideIndex) {
             try {
                 const baseUrl = localStorage.getItem('baseUrl');
+
+                if (baseUrl === undefined) {
+                    showError('No connection configured. Please go back to the main page and configure your connection.');
+                    return;
+                }
+
+                const selected_presentation_id = document.getElementById('presentationSelect').value;
+                if (currentPresentation && selected_presentation_id !== currentPresentation.id.uuid) {
+                    console.log('Selected presentation does not match active presentation');
+                    return;
+                }
+
                 const url = `${baseUrl}/v1/presentation/active/${slideIndex}/trigger`;
 
                 const response = await fetch(url, {
