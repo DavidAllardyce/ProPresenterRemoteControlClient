@@ -2,7 +2,7 @@
 
 A web-based remote control interface for ProPresenter, allowing you to monitor and control presentations from any device with a web browser.
 
-![ProPresenter Remote Control Client Screenshot](https://example.com/screenshot.png)
+https://davidallardyce.github.io/ProPresenterRemoteControlClient/
 
 ## Features
 
@@ -24,10 +24,7 @@ A web-based remote control interface for ProPresenter, allowing you to monitor a
 
 ### Installation
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/DavidAllardyce/ProPresenterRemoteControlClient.git
-   ```
+1. Copy the files from the [docs](/docs) folder 
 
 2. Deploy the files to any web server or open them directly in your browser.
 
